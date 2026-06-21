@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}صفحه اصلی — فروشگاه آنلاین کتاب{% endblock %}
+
+{% block content %}
+
+<section class="py-5 mb-4 rounded-3 text-white text-center" style="background: linear-gradient(135deg, #1a1a2e, #16213e);">
+    <div class="container py-3">
+        <h1 class="display-5 fw-bold mb-3">به فروشگاه آنلاین کتاب خوش آمدید 📚</h1>
+        <p class="lead mb-4">بهترین کتاب‌های علمی، ادبی و آموزشی را با بهترین قیمت پیدا کنید</p>
+        <a href="{% url 'books:book_list' %}" class="btn btn-warning btn-lg px-5">
+            مشاهده همه کتاب‌ها ←
+        </a>
+    </div>
+</section>
+
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">جدیدترین کتاب‌ها</h2>
+        <a href="{% url 'books:book_list' %}" class="btn btn-outline-dark btn-sm">مشاهده همه</a>
+    </div>
+
+    {% if latest_books %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for book in latest_books %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <a href="{% url 'books:book_detail' book.slug %}">
+                        {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}"
+                                 class="card-img-top object-fit-cover"
+                                 style="height: 220px;"
+                                 alt="{{ book.title }}">
+                        {% else %}
+                            <div class="bg-secondary d-flex align-items-center justify-content-center text-white"
+                                 style="height: 220px; font-size: 3rem;">
+                                📖
+                            </div>
+                        {% endif %}
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        {% if book.category %}
+                            <span class="badge bg-warning text-dark mb-2 align-self-start">
+                                {{ book.category.name }}
+                            </span>
+                        {% endif %}
+                        <h6 class="card-title fw-bold">
+                            <a href="{% url 'books:book_detail' book.slug %}"
+                               class="text-decoration-none text-dark stretched-link">
+                                {{ book.title }}
+                            </a>
+                        </h6>
+                        <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
+                            <span class="text-success fw-bold">
+                                {{ book.price|floatformat:0 }} تومان
+                            </span>
+                            {% if book.is_available %}
+                                <span class="badge bg-success">موجود</span>
+                            {% else %}
+                                <span class="badge bg-danger">ناموجود</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 text-muted">
+            <p class="fs-5">در حال حاضر کتابی موجود نیست.</p>
+        </div>
+    {% endif %}
+
+</section>
+
+{% endblock %}

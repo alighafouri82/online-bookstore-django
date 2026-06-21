@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} — فروشگاه آنلاین کتاب{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <a href="{% url 'books:book_list' %}" class="btn btn-outline-secondary btn-sm">
+        → بازگشت به لیست کتاب‌ها
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <div class="row g-4">
+
+            <div class="col-md-3 text-center">
+                {% if book.cover_image %}
+                    <img src="{{ book.cover_image.url }}"
+                         class="img-fluid rounded shadow"
+                         style="max-height: 380px; object-fit: cover;"
+                         alt="{{ book.title }}">
+                {% else %}
+                    <div class="bg-secondary d-flex align-items-center justify-content-center text-white rounded shadow"
+                         style="height: 380px; font-size: 5rem;">
+                        📖
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-9">
+
+                <h2 class="fw-bold mb-2">{{ book.title }}</h2>
+
+                <div class="mb-3">
+                    {% for author in book.authors.all %}
+                        <span class="badge bg-light text-dark border me-1">
+                            ✍️ {{ author }}
+                        </span>
+                    {% empty %}
+                        <span class="text-muted small">نویسنده نامشخص</span>
+                    {% endfor %}
+                </div>
+
+                <hr>
+
+                <div class="row g-2 mb-3">
+
+                    {% if book.category %}
+                    <div class="col-sm-6 d-flex align-items-center gap-2">
+                        <span class="text-muted small">دسته‌بندی:</span>
+                        <span class="badge bg-warning text-dark">
+                            {{ book.category.name }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    {% if book.published_date %}
+                    <div class="col-sm-6 d-flex align-items-center gap-2">
+                        <span class="text-muted small">تاریخ انتشار:</span>
+                        <span class="fw-semibold small">{{ book.published_date }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="col-sm-6 d-flex align-items-center gap-2">
+                        <span class="text-muted small">وضعیت موجودی:</span>
+                        {% if book.is_available %}
+                            <span class="badge bg-success">
+                                موجود در انبار ({{ book.stock }} عدد)
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger">ناموجود</span>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <hr>
+
+                {% if book.description %}
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-2">معرفی کتاب</h6>
+                    <p class="text-muted lh-lg">{{ book.description }}</p>
+                </div>
+                {% endif %}
+
+                <div class="p-3 bg-light rounded mb-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div>
+                            <span class="text-muted small d-block mb-1">قیمت</span>
+                            <span class="fs-3 fw-bold text-success">
+                                {{ book.price|floatformat:0 }}
+                                <small class="fs-6 fw-normal">تومان</small>
+                            </span>
+                        </div>
+
+                        {% if book.is_available %}
+                            <form method="post" action="{% url 'cart:add_to_cart' book.id %}">
+                                {% csrf_token %}
+                                <div class="d-flex align-items-end gap-2 flex-wrap">
+                                    <div>
+                                        <label for="quantity" class="form-label text-muted small mb-1">
+                                            تعداد
+                                        </label>
+                                        <input type="number"
+                                               name="quantity"
+                                               id="quantity"
+                                               value="1"
+                                               min="1"
+                                               max="{{ book.stock }}"
+                                               class="form-control text-center"
+                                               style="width: 85px;">
+                                    </div>
+                                    <button type="submit" class="btn btn-dark btn-lg px-4">
+                                        🛒 افزودن به سبد خرید
+                                    </button>
+                                </div>
+                                <div class="text-muted small mt-2">
+                                    {{ book.stock }} عدد در انبار موجود است
+                                </div>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-secondary btn-lg px-4" disabled>
+                                ❌ ناموجود
+                            </button>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3 text-muted small">
+                    <span>🔒 پرداخت امن</span>
+                    <span>🚚 ارسال رایگان</span>
+                    <span>↩️ ضمانت مرجوعی ۷ روزه</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

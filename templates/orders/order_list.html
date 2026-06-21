@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}سفارش‌های من — فروشگاه آنلاین کتاب{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">📦 سفارش‌های من</h2>
+    <a href="{% url 'books:book_list' %}" class="btn btn-outline-secondary btn-sm">
+        → ادامه خرید
+    </a>
+</div>
+
+{% if orders %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-3">شماره سفارش</th>
+                            <th class="text-center py-3">وضعیت</th>
+                            <th class="text-center py-3">مبلغ کل</th>
+                            <th class="text-center py-3">تاریخ ثبت</th>
+                            <th class="text-center py-3">جزئیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td class="px-4 py-3 fw-semibold">
+                                #{{ order.id }}
+                            </td>
+
+                            <td class="text-center">
+                                {% if order.status == "pending" %}
+                                    <span class="badge bg-warning text-dark">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                {% elif order.status == "confirmed" %}
+                                    <span class="badge bg-primary">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                {% elif order.status == "shipped" %}
+                                    <span class="badge bg-info text-dark">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                {% elif order.status == "delivered" %}
+                                    <span class="badge bg-success">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                {% elif order.status == "cancelled" %}
+                                    <span class="badge bg-danger">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center fw-semibold text-success">
+                                {{ order.total_price|floatformat:0 }} تومان
+                            </td>
+
+                            <td class="text-center text-muted small">
+                                {{ order.created_at|date:"Y/m/d" }}
+                            </td>
+
+                            <td class="text-center">
+                                <a href="{% url 'orders:order_detail' order.pk %}"
+                                   class="btn btn-outline-dark btn-sm">
+                                    مشاهده
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <div class="text-center py-5">
+        <div style="font-size: 5rem;">📭</div>
+        <h4 class="fw-bold mt-3 mb-2">هیچ سفارشی ثبت نشده است</h4>
+        <p class="text-muted mb-4">هنوز هیچ سفارشی ثبت نکرده‌اید.</p>
+        <a href="{% url 'books:book_list' %}" class="btn btn-dark btn-lg px-5">
+            مشاهده کتاب‌ها
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

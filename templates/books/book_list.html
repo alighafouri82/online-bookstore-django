@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}لیست کتاب‌ها — فروشگاه آنلاین کتاب{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">همه کتاب‌ها</h2>
+    <span class="text-muted small">{{ paginator.count }} کتاب موجود</span>
+</div>
+
+{% if books %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for book in books %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <a href="{% url 'books:book_detail' book.slug %}">
+                    {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}"
+                             class="card-img-top object-fit-cover"
+                             style="height: 220px;"
+                             alt="{{ book.title }}">
+                    {% else %}
+                        <div class="bg-secondary d-flex align-items-center justify-content-center text-white"
+                             style="height: 220px; font-size: 3rem;">
+                            📖
+                        </div>
+                    {% endif %}
+                </a>
+                <div class="card-body d-flex flex-column">
+                    {% if book.category %}
+                        <span class="badge bg-warning text-dark mb-2 align-self-start">
+                            {{ book.category.name }}
+                        </span>
+                    {% endif %}
+                    <h6 class="card-title fw-bold">
+                        <a href="{% url 'books:book_detail' book.slug %}"
+                           class="text-decoration-none text-dark stretched-link">
+                            {{ book.title }}
+                        </a>
+                    </h6>
+                    <p class="text-muted small mb-2">
+                        {% for author in book.authors.all %}
+                            {{ author }}{% if not forloop.last %}، {% endif %}
+                        {% endfor %}
+                    </p>
+                    <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
+                        <span class="text-success fw-bold">
+                            {{ book.price|floatformat:0 }} تومان
+                        </span>
+                        {% if book.is_available %}
+                            <span class="badge bg-success">موجود</span>
+                        {% else %}
+                            <span class="badge bg-danger">ناموجود</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <nav class="mt-5 d-flex justify-content-center" aria-label="صفحه‌بندی">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">« اول</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+                </li>
+            {% endif %}
+
+            {% for num in paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ paginator.num_pages }}">آخر »</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+{% else %}
+    <div class="text-center py-5 text-muted">
+        <p class="fs-4">📭 هیچ کتابی یافت نشد.</p>
+        <a href="{% url 'books:home' %}" class="btn btn-outline-dark mt-2">بازگشت به صفحه اصلی</a>
+    </div>
+{% endif %}
+
+{% endblock %}
